@@ -28,17 +28,21 @@ public class T2ARouter extends RouteBuilder {
 		 * Strategy 1: split and pull one PI at a time
 		 * 
 		 */
-		from("timer:analytics?repeatCount=1&period=3000000").routeId("t2a")
+		from("timer:analytics?repeatCount=1&period=3000000")
+			.routeId("t2a")
+			.setHeader("Authorization", constant(t2aAuthHeader))
+			.to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/" + PIGroup)
+			.split().jsonpath("$.programIndicators[*].id").executorService(programIndicatorPool)
+				.log("Procesing programIndicator: ${body}")
+				.process(new DataValueSetQueryBuilder())
 				.setHeader("Authorization", constant(t2aAuthHeader))
-				.to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/" + PIGroup)
-				.split().jsonpath("$.programIndicators[*].id").executorService(programIndicatorPool)
-				.log("Procesing programIndicator: ${body}").process(new DataValueSetQueryBuilder())
-				.setHeader("Authorization", constant(t2aAuthHeader))
-				.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/analytics/dataValueSet.json").log("${body}")
+				.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/analytics/dataValueSet.json")
+				.log("${body}")
 				.process(new PostDataValueSetQueryBuilder()).setHeader("Authorization", constant(t2aAuthHeader))
 				.setHeader("Content-Type", constant("application/json")).log("Posting datavalueset")
-				.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/dataValueSets").log("${body}").end()
-				.log("T2A done");
+				.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/dataValueSets").log("${body}")
+				.end()
+			.log("T2A done");
 
 		/*
 		 * Strategy 2: All-in-one
