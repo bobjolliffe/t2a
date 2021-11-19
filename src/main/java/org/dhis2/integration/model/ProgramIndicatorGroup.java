@@ -31,6 +31,7 @@ public class ProgramIndicatorGroup {
 
 	public String PIsAsString()
 	{
+		// 778ttg7t78;gygyugg56;guigh879yyyfg;89uy98
 		String result = "";
 		for (ProgramIndicator pi : programIndicators) 
 		{

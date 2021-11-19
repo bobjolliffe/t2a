@@ -33,10 +33,10 @@ public class T2ARouter extends RouteBuilder {
 		 * Strategy 1: split and pull one PI at a time
 		 * 
 		 */
-		/*from("timer:analytics?repeatCount=1&period=3000000")
+		/* from("timer:analytics?repeatCount=1&period=3000000")
 			.routeId("t2a")
 			.setHeader("Authorization", constant(t2aAuthHeader))
-			.to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/" + PIGroup)
+			.to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/{{dhis2.t2a.PIGroup}}")
 			.split().jsonpath("$.programIndicators[*].id").executorService(programIndicatorPool)
 				.log("Procesing programIndicator: ${body}")
 				.process(new DataValueSetQueryBuilder())
@@ -45,18 +45,19 @@ public class T2ARouter extends RouteBuilder {
 				// .log("${body}")
 				.process(new PostDataValueSetQueryBuilder()).setHeader("Authorization", constant(t2aAuthHeader))
 				.setHeader("Content-Type", constant("application/json")).log("Posting datavalueset")
-				//.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/dataValueSets").log("${body}")
+				.toD("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/dataValueSets").log("${body}")
 				.end()
 			.log("T2A done");
-*/
+         */
+		
 		/*
 		 * Strategy 2: All-in-one
 		 * 
 		 */
-		 
-		 from("timer:analytics?repeatCount=1&period=3000000") 
+
+		from("timer:analytics?repeatCount=1&period=3000000") 
 		   .routeId("t2a")
-		   .log("Fetching progaram indicators from group")
+		   .log("Fetching program indicators from group")
 		   .setHeader("Authorization", constant(t2aAuthHeader) ) 
 		   .to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/{{dhis2.t2a.PIGroup}}") 
 		   .unmarshal().json(ProgramIndicatorGroup.class)
@@ -73,7 +74,7 @@ public class T2ARouter extends RouteBuilder {
 		   .log("${body}") 
 		   .log("T2A done");
 	}
-	
+		
 	private String getAuthHeader(String prefix) {
 		PropertiesComponent properties = (PropertiesComponent) getContext().getPropertiesComponent();
 		
