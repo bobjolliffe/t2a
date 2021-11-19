@@ -23,11 +23,11 @@ public class T2ARouter extends RouteBuilder {
 		PropertiesComponent properties = (PropertiesComponent) getContext().getPropertiesComponent();
 		
 		String t2aAuthHeader = getAuthHeader("dhis2.t2a");
-		String PIGroup = properties.resolveProperty("dhis2.t2a.PIGroup").get();
-		int poolSize = Integer.parseInt(properties.resolveProperty("dhis2.t2a.pool").get());
+		//String PIGroup = properties.resolveProperty("dhis2.t2a.PIGroup").get();
+		//int poolSize = Integer.parseInt(properties.resolveProperty("dhis2.t2a.pool").get());
 		
 		ThreadPoolBuilder builder = new ThreadPoolBuilder(getContext());
-		ExecutorService programIndicatorPool = builder.poolSize(poolSize).maxPoolSize(40).build();
+		ExecutorService programIndicatorPool = builder.poolSize(10).maxPoolSize(40).build();
 
 		/*
 		 * Strategy 1: split and pull one PI at a time
@@ -58,7 +58,7 @@ public class T2ARouter extends RouteBuilder {
 		   .routeId("t2a")
 		   .log("Fetching progaram indicators from group")
 		   .setHeader("Authorization", constant(t2aAuthHeader) ) 
-		   .to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/" + PIGroup) 
+		   .to("https://{{dhis2.t2a.host}}/{{dhis2.t2a.path}}/api/programIndicatorGroups/{{dhis2.t2a.PIGroup}}") 
 		   .unmarshal().json(ProgramIndicatorGroup.class)
 		   .process(new GatherPIQueryString())
 		   .process(new DataValueSetQueryBuilder()) 
