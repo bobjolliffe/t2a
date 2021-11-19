@@ -1,4 +1,4 @@
-package org.dhis2.integration;
+package org.dhis2.integration.processors;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 

@@ -1,4 +1,4 @@
-package org.dhis2.integration;
+package org.dhis2.integration.routes;
 
 import java.util.Base64;
 import java.util.concurrent.ExecutorService;
@@ -8,6 +8,9 @@ import org.apache.camel.builder.ThreadPoolBuilder;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.jsonpath.JsonPathExpression;
 import org.dhis2.integration.model.ProgramIndicatorGroup;
+import org.dhis2.integration.processors.DataValueSetQueryBuilder;
+import org.dhis2.integration.processors.GatherPIQueryString;
+import org.dhis2.integration.processors.PostDataValueSetQueryBuilder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,11 +26,10 @@ public class T2ARouter extends RouteBuilder {
 		PropertiesComponent properties = (PropertiesComponent) getContext().getPropertiesComponent();
 		
 		String t2aAuthHeader = getAuthHeader("dhis2.t2a");
-		//String PIGroup = properties.resolveProperty("dhis2.t2a.PIGroup").get();
-		//int poolSize = Integer.parseInt(properties.resolveProperty("dhis2.t2a.pool").get());
+		int poolSize = Integer.parseInt(properties.resolveProperty("dhis2.t2a.pool").get());
 		
 		ThreadPoolBuilder builder = new ThreadPoolBuilder(getContext());
-		ExecutorService programIndicatorPool = builder.poolSize(10).maxPoolSize(40).build();
+		ExecutorService programIndicatorPool = builder.poolSize(poolSize).maxPoolSize(40).build();
 
 		/*
 		 * Strategy 1: split and pull one PI at a time
